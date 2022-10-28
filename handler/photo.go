@@ -155,6 +155,6 @@ func DeletePhoto(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Photo Anda berhasil dihapus",
+		"message": "Your Photo has been successfully deleted",
 	})
 }

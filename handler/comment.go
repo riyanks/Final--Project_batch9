@@ -154,6 +154,6 @@ func DeleteComment(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Komen anda berhasil dihapus",
+		"message": "Your comment has been successfully deleted",
 	})
 }

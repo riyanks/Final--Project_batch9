@@ -154,6 +154,6 @@ func DeleteSocialMedia(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Media sosial Anda telah dihapus",
+		"message": "Your social media has been successfully deleted",
 	})
 }

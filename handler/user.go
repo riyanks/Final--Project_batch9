@@ -184,6 +184,6 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Akun anda telah berhasil dihapus",
+		"message": "Your account has been successfully deleted",
 	})
 }
