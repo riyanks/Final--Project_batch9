@@ -1,10 +1,10 @@
-package controllers
+package handler
 
 import (
 	"encoding/json"
 	"final-project/config"
+	"final-project/entity"
 	"final-project/helpers"
-	"final-project/models"
 	"net/http"
 	"strconv"
 
@@ -17,7 +17,7 @@ func CreateComment(c *gin.Context) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	contentType := helpers.GetContentType(c)
 
-	commentRequest := models.CreateComment{}
+	commentRequest := entity.CreateComment{}
 	userID := uint(userData["id"].(float64))
 
 	if contentType == appJSON {
@@ -38,7 +38,7 @@ func CreateComment(c *gin.Context) {
 		}
 	}
 
-	comment := models.Comment{
+	comment := entity.Comment{
 		PhotoId: commentRequest.PhotoId,
 		Message: commentRequest.Message,
 		UserId:  userID,
@@ -54,7 +54,7 @@ func CreateComment(c *gin.Context) {
 	}
 
 	commentString, _ := json.Marshal(comment)
-	commentResponse := models.CreateCommentResponse{}
+	commentResponse := entity.CreateCommentResponse{}
 	json.Unmarshal(commentString, &commentResponse)
 
 	c.JSON(http.StatusCreated, commentResponse)
@@ -63,7 +63,7 @@ func CreateComment(c *gin.Context) {
 func GetComment(c *gin.Context) {
 	db := config.GetDB()
 
-	comments := []models.Comment{}
+	comments := []entity.Comment{}
 
 	err := db.Debug().Preload("User").Preload("Photo").Order("id asc").Find(&comments).Error
 	if err != nil {
@@ -75,7 +75,7 @@ func GetComment(c *gin.Context) {
 	}
 
 	commentsString, _ := json.Marshal(comments)
-	commentsResponse := []models.CommentResponse{}
+	commentsResponse := []entity.CommentResponse{}
 	json.Unmarshal(commentsString, &commentsResponse)
 
 	c.JSON(http.StatusOK, commentsResponse)
@@ -86,7 +86,7 @@ func UpdateComment(c *gin.Context) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	contentType := helpers.GetContentType(c)
 
-	commentRequest := models.UpdateComment{}
+	commentRequest := entity.UpdateComment{}
 	commentId, _ := strconv.Atoi(c.Param("commentId"))
 	userID := uint(userData["id"].(float64))
 
@@ -108,12 +108,12 @@ func UpdateComment(c *gin.Context) {
 		}
 	}
 
-	comment := models.Comment{}
+	comment := entity.Comment{}
 	comment.ID = uint(commentId)
 	comment.UserId = userID
 
 	updateString, _ := json.Marshal(commentRequest)
-	updateData := models.Comment{}
+	updateData := entity.Comment{}
 	json.Unmarshal(updateString, &updateData)
 
 	err := db.Model(&comment).Updates(updateData).Error
@@ -127,7 +127,7 @@ func UpdateComment(c *gin.Context) {
 	_ = db.First(&comment, comment.ID).Error
 
 	commentString, _ := json.Marshal(comment)
-	commentResponse := models.UpdateCommentResponse{}
+	commentResponse := entity.UpdateCommentResponse{}
 	json.Unmarshal(commentString, &commentResponse)
 
 	c.JSON(http.StatusOK, commentResponse)
@@ -140,7 +140,7 @@ func DeleteComment(c *gin.Context) {
 	commentId, _ := strconv.Atoi(c.Param("commentId"))
 	userID := uint(userData["id"].(float64))
 
-	comment := models.Comment{}
+	comment := entity.Comment{}
 	comment.ID = uint(commentId)
 	comment.UserId = userID
 

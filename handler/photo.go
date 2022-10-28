@@ -1,10 +1,10 @@
-package controllers
+package handler
 
 import (
 	"encoding/json"
 	"final-project/config"
+	"final-project/entity"
 	"final-project/helpers"
-	"final-project/models"
 	"net/http"
 	"strconv"
 
@@ -17,7 +17,7 @@ func CreatePhoto(c *gin.Context) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	contentType := helpers.GetContentType(c)
 
-	photoRequest := models.CreatePhoto{}
+	photoRequest := entity.CreatePhoto{}
 	userID := uint(userData["id"].(float64))
 
 	if contentType == appJSON {
@@ -38,7 +38,7 @@ func CreatePhoto(c *gin.Context) {
 		}
 	}
 
-	photo := models.Photo{
+	photo := entity.Photo{
 		Title:    photoRequest.Title,
 		Caption:  photoRequest.Caption,
 		PhotoUrl: photoRequest.PhotoUrl,
@@ -56,7 +56,7 @@ func CreatePhoto(c *gin.Context) {
 	_ = db.First(&photo, photo.ID).Error
 
 	photoString, _ := json.Marshal(photo)
-	photoResponse := models.CreatePhotoResponse{}
+	photoResponse := entity.CreatePhotoResponse{}
 	json.Unmarshal(photoString, &photoResponse)
 
 	c.JSON(http.StatusCreated, photoResponse)
@@ -65,7 +65,7 @@ func CreatePhoto(c *gin.Context) {
 func GetPhoto(c *gin.Context) {
 	db := config.GetDB()
 
-	photos := []models.Photo{}
+	photos := []entity.Photo{}
 
 	err := db.Debug().Preload("User").Order("id asc").Find(&photos).Error
 	if err != nil {
@@ -77,7 +77,7 @@ func GetPhoto(c *gin.Context) {
 	}
 
 	photosString, _ := json.Marshal(photos)
-	photosResponse := []models.PhotoResponse{}
+	photosResponse := []entity.PhotoResponse{}
 	json.Unmarshal(photosString, &photosResponse)
 
 	c.JSON(http.StatusOK, photosResponse)
@@ -88,7 +88,7 @@ func UpdatePhoto(c *gin.Context) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	contentType := helpers.GetContentType(c)
 
-	photoRequest := models.UpdatePhoto{}
+	photoRequest := entity.UpdatePhoto{}
 	photoId, _ := strconv.Atoi(c.Param("photoId"))
 	userID := uint(userData["id"].(float64))
 
@@ -110,12 +110,12 @@ func UpdatePhoto(c *gin.Context) {
 		}
 	}
 
-	photo := models.Photo{}
+	photo := entity.Photo{}
 	photo.ID = uint(photoId)
 	photo.UserId = userID
 
 	updateString, _ := json.Marshal(photoRequest)
-	updateData := models.Photo{}
+	updateData := entity.Photo{}
 	json.Unmarshal(updateString, &updateData)
 
 	err := db.Model(&photo).Updates(updateData).Error
@@ -128,7 +128,7 @@ func UpdatePhoto(c *gin.Context) {
 	}
 
 	photoString, _ := json.Marshal(photo)
-	photoResponse := models.UpdatePhotoResponse{}
+	photoResponse := entity.UpdatePhotoResponse{}
 	json.Unmarshal(photoString, &photoResponse)
 
 	c.JSON(http.StatusOK, photoResponse)
@@ -141,7 +141,7 @@ func DeletePhoto(c *gin.Context) {
 	photoId, _ := strconv.Atoi(c.Param("photoId"))
 	userID := uint(userData["id"].(float64))
 
-	photo := models.Photo{}
+	photo := entity.Photo{}
 	photo.ID = uint(photoId)
 	photo.UserId = userID
 

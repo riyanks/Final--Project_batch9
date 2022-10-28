@@ -1,10 +1,10 @@
-package controllers
+package handler
 
 import (
 	"encoding/json"
 	"final-project/config"
+	"final-project/entity"
 	"final-project/helpers"
-	"final-project/models"
 	"net/http"
 	"strconv"
 
@@ -17,7 +17,7 @@ func CreateSocialMedia(c *gin.Context) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	contentType := helpers.GetContentType(c)
 
-	socialMediaRequest := models.CreateSocialMedia{}
+	socialMediaRequest := entity.CreateSocialMedia{}
 	userID := uint(userData["id"].(float64))
 
 	if contentType == appJSON {
@@ -38,7 +38,7 @@ func CreateSocialMedia(c *gin.Context) {
 		}
 	}
 
-	socialMedia := models.SocialMedia{
+	socialMedia := entity.SocialMedia{
 		Name:           socialMediaRequest.Name,
 		SocialMediaUrl: socialMediaRequest.SocialMediaUrl,
 		UserId:         userID,
@@ -54,7 +54,7 @@ func CreateSocialMedia(c *gin.Context) {
 	}
 
 	socialMediaString, _ := json.Marshal(socialMedia)
-	socialMediaResponse := models.CreateSocialMediaResponse{}
+	socialMediaResponse := entity.CreateSocialMediaResponse{}
 	json.Unmarshal(socialMediaString, &socialMediaResponse)
 
 	c.JSON(http.StatusCreated, socialMediaResponse)
@@ -63,7 +63,7 @@ func CreateSocialMedia(c *gin.Context) {
 func GetSocialMedia(c *gin.Context) {
 	db := config.GetDB()
 
-	socialMedias := []models.SocialMedia{}
+	socialMedias := []entity.SocialMedia{}
 
 	err := db.Debug().Preload("User").Order("id asc").Find(&socialMedias).Error
 	if err != nil {
@@ -75,7 +75,7 @@ func GetSocialMedia(c *gin.Context) {
 	}
 
 	socialMediaString, _ := json.Marshal(socialMedias)
-	socialMediaResponse := []models.SocialMediaResponse{}
+	socialMediaResponse := []entity.SocialMediaResponse{}
 	json.Unmarshal(socialMediaString, &socialMediaResponse)
 
 	c.JSON(http.StatusOK, socialMediaResponse)
@@ -86,7 +86,7 @@ func UpdateSocialMedia(c *gin.Context) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	contentType := helpers.GetContentType(c)
 
-	socialMediaRequest := models.UpdateSocialMedia{}
+	socialMediaRequest := entity.UpdateSocialMedia{}
 	socialMediaId, _ := strconv.Atoi(c.Param("socialMediaId"))
 	userID := uint(userData["id"].(float64))
 
@@ -108,12 +108,12 @@ func UpdateSocialMedia(c *gin.Context) {
 		}
 	}
 
-	socialMedia := models.SocialMedia{}
+	socialMedia := entity.SocialMedia{}
 	socialMedia.ID = uint(socialMediaId)
 	socialMedia.UserId = userID
 
 	updateString, _ := json.Marshal(socialMediaRequest)
-	updateData := models.SocialMedia{}
+	updateData := entity.SocialMedia{}
 	json.Unmarshal(updateString, &updateData)
 
 	err := db.Model(&socialMedia).Updates(updateData).Error
@@ -127,7 +127,7 @@ func UpdateSocialMedia(c *gin.Context) {
 	_ = db.First(&socialMedia, socialMedia.ID).Error
 
 	socialMediaString, _ := json.Marshal(socialMedia)
-	socialMediaResponse := models.UpdateSocialMediaResponse{}
+	socialMediaResponse := entity.UpdateSocialMediaResponse{}
 	json.Unmarshal(socialMediaString, &socialMediaResponse)
 
 	c.JSON(http.StatusOK, socialMediaResponse)
@@ -140,7 +140,7 @@ func DeleteSocialMedia(c *gin.Context) {
 	socialMediaId, _ := strconv.Atoi(c.Param("socialMediaId"))
 	userID := uint(userData["id"].(float64))
 
-	socialMedia := models.SocialMedia{}
+	socialMedia := entity.SocialMedia{}
 	socialMedia.ID = uint(socialMediaId)
 	socialMedia.UserId = userID
 

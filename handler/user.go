@@ -1,10 +1,10 @@
-package controllers
+package handler
 
 import (
 	"encoding/json"
 	"final-project/config"
+	"final-project/entity"
 	"final-project/helpers"
-	"final-project/models"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -19,7 +19,7 @@ func UserRegister(c *gin.Context) {
 	db := config.GetDB()
 	contentType := helpers.GetContentType(c)
 
-	userRequest := models.CreateUser{}
+	userRequest := entity.CreateUser{}
 
 	if contentType == appJSON {
 		if err := c.ShouldBindJSON(&userRequest); err != nil {
@@ -39,7 +39,7 @@ func UserRegister(c *gin.Context) {
 		}
 	}
 
-	user := models.User{
+	user := entity.User{
 		Age:             userRequest.Age,
 		Email:           userRequest.Email,
 		Password:        helpers.HashPass(userRequest.Password),
@@ -57,7 +57,7 @@ func UserRegister(c *gin.Context) {
 	}
 
 	userString, _ := json.Marshal(user)
-	userResponse := models.CreateUserResponse{}
+	userResponse := entity.CreateUserResponse{}
 	json.Unmarshal(userString, &userResponse)
 
 	c.JSON(http.StatusCreated, userResponse)
@@ -67,7 +67,7 @@ func UserLogin(c *gin.Context) {
 	db := config.GetDB()
 	contentType := helpers.GetContentType(c)
 
-	userRequest := models.LoginUser{}
+	userRequest := entity.LoginUser{}
 
 	if contentType == appJSON {
 		if err := c.ShouldBindJSON(&userRequest); err != nil {
@@ -88,7 +88,7 @@ func UserLogin(c *gin.Context) {
 	}
 
 	password := userRequest.Password
-	user := models.User{}
+	user := entity.User{}
 
 	err := db.Debug().Where("email = ?", userRequest.Email).Take(&user).Error
 	if err != nil {
@@ -120,7 +120,7 @@ func UpdateUser(c *gin.Context) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	contentType := helpers.GetContentType(c)
 
-	userRequest := models.UpdateUser{}
+	userRequest := entity.UpdateUser{}
 	userID := uint(userData["id"].(float64))
 
 	if contentType == appJSON {
@@ -141,11 +141,11 @@ func UpdateUser(c *gin.Context) {
 		}
 	}
 
-	user := models.User{}
+	user := entity.User{}
 	user.ID = userID
 
 	updateString, _ := json.Marshal(userRequest)
-	updateData := models.User{}
+	updateData := entity.User{}
 	json.Unmarshal(updateString, &updateData)
 
 	err := db.Model(&user).Updates(updateData).Error
@@ -159,7 +159,7 @@ func UpdateUser(c *gin.Context) {
 	_ = db.First(&user, user.ID).Error
 
 	userString, _ := json.Marshal(user)
-	userResponse := models.CreateUserResponse{}
+	userResponse := entity.CreateUserResponse{}
 	json.Unmarshal(userString, &userResponse)
 
 	c.JSON(http.StatusCreated, userResponse)
@@ -171,7 +171,7 @@ func DeleteUser(c *gin.Context) {
 
 	userID := uint(userData["id"].(float64))
 
-	user := models.User{}
+	user := entity.User{}
 	user.ID = userID
 
 	err := db.Delete(&user).Error

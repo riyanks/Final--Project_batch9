@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"final-project/config"
-	"final-project/models"
+	"final-project/entity"
 	"net/http"
 	"strconv"
 
@@ -23,7 +23,7 @@ func PhotoAuthorization() gin.HandlerFunc {
 		}
 		userData := a.MustGet("userData").(jwt.MapClaims)
 		userID := uint(userData["id"].(float64))
-		photo := models.Photo{}
+		photo := entity.Photo{}
 
 		err = db.Select("user_id").First(&photo, uint(photoId)).Error
 		if err != nil {
@@ -59,7 +59,7 @@ func CommentAuthorization() gin.HandlerFunc {
 		}
 		userData := c.MustGet("userData").(jwt.MapClaims)
 		userID := uint(userData["id"].(float64))
-		comment := models.Comment{}
+		comment := entity.Comment{}
 
 		err = db.Select("user_id").First(&comment, uint(commentId)).Error
 		if err != nil {
@@ -95,7 +95,7 @@ func SocialMediaAuthorization() gin.HandlerFunc {
 		}
 		userData := c.MustGet("userData").(jwt.MapClaims)
 		userID := uint(userData["id"].(float64))
-		socialMedia := models.SocialMedia{}
+		socialMedia := entity.SocialMedia{}
 
 		err = db.Select("user_id").First(&socialMedia, uint(socialMediaId)).Error
 		if err != nil {

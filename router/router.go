@@ -1,7 +1,7 @@
 package router
 
 import (
-	"final-project/controllers"
+	"final-project/handler"
 	"final-project/middlewares"
 
 	"github.com/gin-gonic/gin"
@@ -12,37 +12,37 @@ func StartApp() *gin.Engine {
 
 	user := rout.Group("/user")
 	{
-		user.POST("/register", controllers.UserRegister)
-		user.POST("/login", controllers.UserLogin)
-		user.PUT("/", middlewares.Authentication(), controllers.UpdateUser)
-		user.DELETE("/", middlewares.Authentication(), controllers.DeleteUser)
+		user.POST("/register", handler.UserRegister)
+		user.POST("/login", handler.UserLogin)
+		user.PUT("/", middlewares.Authentication(), handler.UpdateUser)
+		user.DELETE("/", middlewares.Authentication(), handler.DeleteUser)
 	}
 
 	photo := rout.Group("/photo")
 	{
 		photo.Use(middlewares.Authentication())
-		photo.POST("/", controllers.CreatePhoto)
-		photo.GET("/", controllers.GetPhoto)
-		photo.PUT("/:photoId", middlewares.PhotoAuthorization(), controllers.UpdatePhoto)
-		photo.DELETE("/:photoId", middlewares.PhotoAuthorization(), controllers.DeletePhoto)
+		photo.POST("/", handler.CreatePhoto)
+		photo.GET("/", handler.GetPhoto)
+		photo.PUT("/:photoId", middlewares.PhotoAuthorization(), handler.UpdatePhoto)
+		photo.DELETE("/:photoId", middlewares.PhotoAuthorization(), handler.DeletePhoto)
 	}
 
 	comment := rout.Group("/comment")
 	{
 		comment.Use(middlewares.Authentication())
-		comment.POST("/", controllers.CreateComment)
-		comment.GET("/", controllers.GetComment)
-		comment.PUT("/:commentId", middlewares.CommentAuthorization(), controllers.UpdateComment)
-		comment.DELETE("/:commentId", middlewares.CommentAuthorization(), controllers.DeleteComment)
+		comment.POST("/", handler.CreateComment)
+		comment.GET("/", handler.GetComment)
+		comment.PUT("/:commentId", middlewares.CommentAuthorization(), handler.UpdateComment)
+		comment.DELETE("/:commentId", middlewares.CommentAuthorization(), handler.DeleteComment)
 	}
 
 	socialmedia := rout.Group("/socialmedia")
 	{
 		socialmedia.Use(middlewares.Authentication())
-		socialmedia.POST("/", controllers.CreateSocialMedia)
-		socialmedia.GET("/", controllers.GetSocialMedia)
-		socialmedia.PUT("/:socialMediaId", middlewares.SocialMediaAuthorization(), controllers.UpdateSocialMedia)
-		socialmedia.DELETE("/:socialMediaId", middlewares.SocialMediaAuthorization(), controllers.DeleteSocialMedia)
+		socialmedia.POST("/", handler.CreateSocialMedia)
+		socialmedia.GET("/", handler.GetSocialMedia)
+		socialmedia.PUT("/:socialMediaId", middlewares.SocialMediaAuthorization(), handler.UpdateSocialMedia)
+		socialmedia.DELETE("/:socialMediaId", middlewares.SocialMediaAuthorization(), handler.DeleteSocialMedia)
 	}
 
 	return rout

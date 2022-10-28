@@ -1,7 +1,7 @@
 package config
 
 import (
-	"final-project/models"
+	"final-project/entity"
 	"fmt"
 	"log"
 
@@ -30,7 +30,7 @@ func StartDB() {
 
 	defer fmt.Println("Sukses terhubung ke Database")
 
-	db.Debug().AutoMigrate(models.User{}, models.Comment{}, models.Photo{}, models.SocialMedia{})
+	db.Debug().AutoMigrate(entity.User{}, entity.Comment{}, entity.Photo{}, entity.SocialMedia{})
 }
 
 func GetDB() *gorm.DB {
